@@ -8,6 +8,7 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// 保留这段代码，但后续不再强制依赖它
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
@@ -39,21 +40,12 @@ android {
         versionName = flutter.versionName
     }
 
-    signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String
-            isV1SigningEnabled = true
-            isV2SigningEnabled = true
-        }
-    }
-
+    // 关键修改：移除可能导致错误的release签名配置创建
+    // 直接将构建配置为在release模式下使用debug签名（用于测试）
     buildTypes {
         release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("release")
+            // 修改这里：使用debug签名而非release签名
+            signingConfig = signingConfigs.getByName("debug") // 此行已修改
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
